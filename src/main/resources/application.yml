@@ -1,0 +1,10 @@
+server:
+  error:
+    whitelabel:
+      enabled: true
+  servlet:
+    encoding:
+      force: true
+spring:
+    profiles:
+      active: "dev"
