@@ -1,6 +1,6 @@
 package com.ihouse.backend.vo;
 
-import enums.ResponseEnum;
+import com.ihouse.backend.enums.ResponseEnum;
 import lombok.Data;
 import org.springframework.validation.BindingResult;
 
@@ -39,12 +39,28 @@ public class ResponseVo<T> {
         return new ResponseVo<>(ResponseEnum.SUCCESS.getCode(), ResponseEnum.SUCCESS.getDesc());
     }
 
+    public static <T> ResponseVo<T> success(String msg) {
+        return new ResponseVo<>(ResponseEnum.SUCCESS.getCode(), msg);
+    }
+
     public static <T> ResponseVo<T> error(ResponseEnum responseEnum) {
         return new ResponseVo<>(responseEnum.getCode(), responseEnum.getDesc());
     }
 
     public static <T> ResponseVo<T> error(ResponseEnum responseEnum, String msg) {
         return new ResponseVo<>(responseEnum.getCode(), msg);
+    }
+
+    public static <T> ResponseVo<T> error(Integer status, String msg) {
+        return new ResponseVo<>(status, msg);
+    }
+
+    public static <T> ResponseVo<T> error() {
+        return new ResponseVo<>(ResponseEnum.ERROR.getCode(),ResponseEnum.ERROR.getDesc());
+    }
+
+    public static <T> ResponseVo<T> error(String msg) {
+        return new ResponseVo<>(ResponseEnum.ERROR.getCode(),msg);
     }
 
     public static <T> ResponseVo<T> error(ResponseEnum responseEnum, BindingResult bindingResult) {

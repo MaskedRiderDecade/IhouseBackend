@@ -1,20 +1,57 @@
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    password: ''
-    url: jdbc:h2:mem:test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
-    username: sa
+    hikari:
+      auto-commit: false
+      data-source-properties:
+        # 缓存 SQL 语句
+        cachePrepStmts: true
+        # 缓存大小
+        prepStmtCacheSize: 250
+        # 缓存 SQL 的长度限制
+        prepStmtCacheSqlLimit: 2048
+        # 服务器预编译
+        useServerPrepStmts: true
+      pool-name: Hikari
+    type: com.zaxxer.hikari.HikariDataSource
+    # 数据库连接 URL
+    url: jdbc:mysql://121.4.81.114:3306/security?useUnicode=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+    # 数据库用户名
+    username: user
+    # 数据库密码
+    password: password
   h2:
     console:
-      enabled: true
-      path: /h2-console
-      settings:
-        trace: false
-        web-allow-others: false
+      # 禁用 H2 Console
+      enabled: false
   jpa:
-    database: h2
-    database-platform: org.hibernate.dialect.H2Dialect
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create-drop
+      # 禁用 hibernate 的表结构自动更新
+      ddl-auto: none
+    properties:
+      hibernate:
+        connection:
+          provider_disables_autocommit: true
+        generate_statistics: false
+        id:
+          new_generator_mappings: true
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+        query:
+          fail_on_pagination_over_collection_fetch: true
+          in_clause_parameter_padding: true
+    show-sql: false
+  #multipartconfig
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 5MB
+      max-request-size: 20MB
+      location: F:\毕业设计\backend\backend\src\main\resources\tmp
   profiles:
     active: dev
+elasticsearch:
+  host: 121.4.81.114

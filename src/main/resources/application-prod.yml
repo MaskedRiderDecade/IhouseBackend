@@ -1,3 +1,11 @@
+logging:
+  pattern:
+    console:
+      "%clr(%d{E HH:mm:ss.SSS}){blue} %clr(%-5p) %clr(${PID}){faint} %clr(---){faint}
+      %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n"
+  level:
+    com.ihouse: ERROR
+
 spring:
   datasource:
     hikari:
@@ -14,7 +22,7 @@ spring:
       pool-name: Hikari
     type: com.zaxxer.hikari.HikariDataSource
     # 数据库连接 URL
-    url: jdbc:mysql://localhost:3306/security?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/security?useUnicode=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
     # 数据库用户名
     username: user
     # 数据库密码
@@ -53,5 +61,14 @@ spring:
           fail_on_pagination_over_collection_fetch: true
           in_clause_parameter_padding: true
     show-sql: false
+  #multipartconfig
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 5MB
+      max-request-size: 20MB
+      location: /usr/local/ihouse/img/
   profiles:
     active: prod
+elasticsearch:
+  host: 127.0.0.1

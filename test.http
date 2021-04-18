@@ -1,0 +1,204 @@
+@host=http://121.4.81.114:8080
+@host2=http://121.4.81.114:8085
+###
+
+###
+# @name adminLogin
+POST {{host}}/authorize/admin/token
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "12345678"
+}
+
+@adminAccessToken = {{adminLogin.response.body.data.accessToken}}
+@adminRefreshToken = {{adminLogin.response.body.data.refreshToken}}
+
+###
+POST {{host}}/authorize/admin/token/refresh?refreshToken={{adminRefreshToken}}
+Authorization: Bearer {{adminAccessToken}}
+
+###
+# @name userLogin
+POST {{host}}/authorize/token
+Content-Type: application/json
+
+{
+  "username": "wangwu1",
+  "password": "Abcd123$"
+}
+
+@accessToken = {{userLogin.response.body.data.accessToken}}
+@refreshToken = {{userLogin.response.body.data.refreshToken}}
+
+###
+POST {{host}}/authorize/token/refresh?refreshToken={{refreshToken}}
+Authorization: Bearer {{accessToken}}
+###
+POST {{host}}/authorize/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "wangwu2",
+  "name": "王五2",
+  "email": "wangwu2@local.dev",
+  "mobile": "13712341232",
+  "password": "Abcd123$",
+  "matchingPassword": "Abcd123$"
+}
+
+###
+POST {{host2}}/admin/houses
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "page":"1",
+  "pageSize":"15",
+  "direction":"desc",
+  "orderBy":"createTime"
+}
+
+###
+POST {{host2}}/admin/add/house
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "title":"皇家公园2323",
+  "cityEnName":"bj",
+  "regionEnName":"hdq",
+  "street":"龙域东路",
+  "district":"蒂花嘉园",
+  "detailAddress":"3号院4号楼",
+  "room":"3",
+  "bathroom":"1",
+  "parlour":"1",
+  "floor":"2",
+  "totalFloor":"6",
+  "direction":"2",
+  "buildYear":"1998",
+  "area":"70",
+  "price":"4800",
+  "rentWay":"1",
+  "traffic":"交通便利",
+  "subwayLineId":"1",
+  "subwayStationId":"7",
+  "distanceToSubway":"200",
+  "layoutDesc":"房间采光很好",
+  "roundService":"周边配套服务设施齐全，便利店，商店，药店，医院等",
+  "description":"好累啊",
+  "cover":"gundam001",
+  "status":"0",
+  "watchTimes":"0"
+
+}
+
+###
+POST {{host2}}/admin/house/edit
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "id":"39",
+  "title":"帝王宫殿",
+  "cityEnName":"bj",
+  "regionEnName":"hdq",
+  "street":"龙域北路",
+  "district":"蒂花嘉园",
+  "detailAddress":"6号院2号楼",
+  "room":"2",
+  "bathroom":"1",
+  "parlour":"1",
+  "floor":"4",
+  "totalFloor":"6",
+  "direction":"2",
+  "buildYear":"2001",
+  "area":"60",
+  "price":"7200",
+  "rentWay":"0",
+  "traffic":"交通便利",
+  "subwayLineId":"1",
+  "subwayStationId":"7",
+  "distanceToSubway":"200",
+  "layoutDesc":"房间采光很好",
+  "roundService":"周边配套服务设施齐全，便利店，商店，药店，医院等",
+  "description":"好累啊好累啊",
+  "cover":"house06.jpg",
+  "status":"1",
+  "watchTimes":"0"
+}
+
+###
+POST {{host2}}/admin/house/cover?cover=ultraman&targetId=37
+Authorization: Bearer {{adminAccessToken}}
+
+###
+POST {{host2}}/admin/house/tag?tag=光之国&houseId=38
+Authorization: Bearer {{adminAccessToken}}
+
+###
+DELETE {{host2}}/admin/house/tag?tag=光之国&houseId=37
+Authorization: Bearer {{adminAccessToken}}
+
+###
+POST {{host2}}/rent/house
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "page":"1",
+  "size":"5",
+  "cityEnName":"bj",
+  "orderBy":"price",
+  "orderDirection":"desc",
+  "regionEnName":"hdq"
+}
+
+###
+POST {{host2}}/rent/house
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "page":"1",
+  "size":"5",
+  "cityEnName":"bj",
+  "orderBy":"price",
+  "orderDirection":"asc",
+  "keywords":"城",
+  "priceBlock":"*-5000",
+  "areaBlock":"100-*"
+  
+  
+  
+}
+
+###
+GET {{host2}}/admin/house/edit?id=39
+Authorization: Bearer {{adminAccessToken}}
+
+###
+GET {{host2}}/rent/house/show?id=18
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{host2}}/address/support/cities
+
+###
+GET {{host2}}/address/support/regions?city_name=bj
+
+###
+GET {{host2}}/address/support/subway/line?city_name=bj
+
+###
+GET {{host2}}/address/support/subway/station?subway_id=1
+
+###
+GET {{host2}}/getUser
+Authorization: Bearer {{adminAccessToken}}
+
+###
+GET {{host2}}/getUser
+Authorization: Bearer {{accessToken}}
