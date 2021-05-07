@@ -1,5 +1,6 @@
 package com.ihouse.backend.service.house;
 
+import com.ihouse.backend.constants.RentValueBlock;
 import com.ihouse.backend.domain.*;
 import com.ihouse.backend.dto.HouseDetailDto;
 import com.ihouse.backend.dto.HouseDto;
@@ -411,6 +412,36 @@ public class HouseService {
             HouseDto houseDto=houseMap.get(houseTag.getHouseId());
             houseDto.getTags().add(houseTag.getName());
         });
+        //范围查询
+        RentValueBlock area =RentValueBlock.matchArea(rentSearch.getAreaBlock());
+        if(!RentValueBlock.ALL.equals(area)){
+            if(area.getMax()>0){
+                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getArea()<area.getMax()).collect(Collectors.toList());
+            }
+            if(area.getMin()>0){
+                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getArea()>area.getMin()).collect(Collectors.toList());
+            }
+        }
+        RentValueBlock price =RentValueBlock.matchPrice(rentSearch.getPriceBlock());
+        if(!RentValueBlock.ALL.equals(price)){
+            if(price.getMax()>0){
+                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getPrice()<price.getMax()).collect(Collectors.toList());
+            }
+            if(price.getMin()>0){
+                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getPrice()>price.getMin()).collect(Collectors.toList());
+            }
+        }
+
+        //租赁方式
+        if(rentSearch.getRentWay()>-1){
+            houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getHouseDetail().getRentWay()==rentSearch.getRentWay()).collect(Collectors.toList());
+        }
+
+        //排序的处理
+        if(rentSearch.getOrderBy().equals("price")&&rentSearch.getOrderDirection().equals("desc")
+        || rentSearch.getOrderBy().equals("area")&&rentSearch.getOrderDirection().equals("asc")){
+            Collections.reverse(houseDtos);
+        }
 
         return new ServiceMultiResult<>(houseDtos.size(),houseDtos);
     }

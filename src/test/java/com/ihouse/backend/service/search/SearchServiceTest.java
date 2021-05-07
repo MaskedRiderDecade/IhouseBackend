@@ -27,13 +27,12 @@ public class SearchServiceTest {
 
     @Test
     public void index() {
-        boolean success=searchService.index(38L);
-//        searchService.index(15L);
-//        searchService.index(17L);
+        boolean success=searchService.index(21L);
+        searchService.index(24L);
 //        searchService.index(18L);
 //        searchService.index(19L);
 //        searchService.index(20L);
-        Assert.assertEquals(true,success);
+        Assert.assertTrue(success);
     }
 
     @Test

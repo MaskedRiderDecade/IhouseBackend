@@ -92,6 +92,7 @@ public class HouseController {
         }
 
         ServiceMultiResult<HouseDto>result=houseService.query(rentSearch);
+
         return ResponseVo.success(result.getResult());
     }
 
