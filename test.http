@@ -149,12 +149,26 @@ Content-Type: application/json
 
 {
   "page":"1",
-  "size":"5",
+  "size":"15",
   "cityEnName":"bj",
   "orderBy":"price",
-  "orderDirection":"desc",
-  "regionEnName":"hdq"
+  "orderDirection":"desc"
 }
+
+###
+POST {{host2}}/rent/house
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "page":"1",
+  "size":"5",
+  "cityEnName":"bj",
+  "regionEnName":"cpq",
+  "orderBy":"area",
+  "orderDirection":"desc"
+}
+
 
 ###
 POST {{host2}}/rent/house
@@ -166,12 +180,10 @@ Content-Type: application/json
   "size":"5",
   "cityEnName":"bj",
   "orderBy":"price",
-  "orderDirection":"asc",
-  "keywords":"城",
-  "priceBlock":"*-5000",
+  "orderDirection":"desc",
+  "keywords":"大宅",
+  "rentWay":"0",
   "areaBlock":"100-*"
-  
-  
   
 }
 
@@ -202,3 +214,19 @@ Authorization: Bearer {{adminAccessToken}}
 ###
 GET {{host2}}/getUser
 Authorization: Bearer {{accessToken}}
+
+
+
+###
+POST http://localhost:8085/rent/house
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "page":"1",
+  "size":"15",
+  "cityEnName":"bj",
+  "orderBy":"area",
+  "orderDirection":"asc",
+  "areaBlock":"*-60"
+}
