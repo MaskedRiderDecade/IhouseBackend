@@ -45,7 +45,7 @@ public class RentSearch {
     }
 
     public int getRentWay() {
-        if (rentWay >0 && rentWay < 3) {
+        if (rentWay >=0 && rentWay < 2) {
             return rentWay;
         } else {
             return -1;

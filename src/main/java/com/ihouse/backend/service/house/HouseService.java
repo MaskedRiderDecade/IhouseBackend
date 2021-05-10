@@ -21,9 +21,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Predicate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -355,43 +357,43 @@ public class HouseService {
     public ServiceMultiResult<HouseDto> simpleQuery(RentSearch rentSearch) {
         Pageable pageable = PageRequest.of(rentSearch.getPage()-1, rentSearch.getSize());
         Page<House> houses;
-        if(rentSearch.getRegionEnName().equals("*")){
-            if(rentSearch.getOrderDirection()==null){
-                houses=houseRepo.findByStatusAndCityEnNameOrderByLastUpdateTimeDesc(
-                        1,rentSearch.getCityEnName(),pageable);
-            }
-            switch(rentSearch.getOrderBy()){
-                case "price":houses=houseRepo.findByStatusAndCityEnNameOrderByPriceAsc(
-                        1,rentSearch.getCityEnName(),pageable);break;
-                case"area":houses=houseRepo.findByStatusAndCityEnNameOrderByAreaDesc(
-                        1,rentSearch.getCityEnName(),pageable);break;
-                case"distanceToSubway":houses=houseRepo.findByStatusAndCityEnNameOrderByDistanceToSubwayAsc(
-                        1,rentSearch.getCityEnName(),pageable);break;
-                default:houses=houseRepo.findByStatusAndCityEnNameOrderByLastUpdateTimeDesc(
-                        1,rentSearch.getCityEnName(),pageable);break;
-            }
-        }else{
-            if(rentSearch.getOrderDirection()==null){
-                houses=houseRepo.findByStatusAndCityEnNameAndRegionEnNameOrderByLastUpdateTimeDesc(1,rentSearch.getCityEnName(),rentSearch.getRegionEnName(),pageable);
-            }
-            switch(rentSearch.getOrderBy()){
-                case "price":houses=houseRepo.findByStatusAndCityEnNameAndRegionEnNameOrderByPriceAsc(
-                        1,rentSearch.getCityEnName(),rentSearch.getRegionEnName(),pageable);break;
-                case"area":houses=houseRepo.findByStatusAndCityEnNameAndRegionEnNameOrderByAreaDesc(
-                        1,rentSearch.getCityEnName(),rentSearch.getRegionEnName(),pageable);break;
-                case"distanceToSubway":houses=houseRepo.findByStatusAndCityEnNameAndRegionEnNameOrderByDistanceToSubwayAsc(
-                        1,rentSearch.getCityEnName(),rentSearch.getRegionEnName(),pageable);break;
-                default:houses=houseRepo.findByStatusAndCityEnNameAndRegionEnNameOrderByLastUpdateTimeDesc(
-                        1,rentSearch.getCityEnName(),rentSearch.getRegionEnName(),pageable);break;
-            }
-        }
-        //默认以创建时间排序，另支持按价格，面积，去地铁的距离排序
 
+        RentValueBlock area =RentValueBlock.matchArea(rentSearch.getAreaBlock());
+        RentValueBlock price =RentValueBlock.matchPrice(rentSearch.getPriceBlock());
+        Specification<House>specification=(root,query,cb)->{
+            Predicate predicate=cb.equal(root.get("cityEnName"),rentSearch.getCityEnName());
+            predicate=cb.and(predicate,cb.equal(root.get("status"),1));
+            if(!rentSearch.getRegionEnName().equals("*")){
+                predicate=cb.and(predicate,cb.equal(root.get("regionEnName"),rentSearch.getRegionEnName()));
+            }
+            if(!RentValueBlock.ALL.equals(area)){
+                if(area.getMin()>0){
+                    predicate=cb.and(predicate,cb.greaterThanOrEqualTo(root.get("area"),area.getMin()));
+                }
+                if(area.getMax()>0){
+                    predicate=cb.and(predicate,cb.lessThanOrEqualTo(root.get("area"),area.getMax()));
+                }
+            }
+            if(!RentValueBlock.ALL.equals(price)){
+                if(price.getMin()>0){
+                    predicate=cb.and(predicate,cb.greaterThanOrEqualTo(root.get("price"),price.getMin()));
+                }
+                if(price.getMax()>0){
+                    predicate=cb.and(predicate,cb.lessThanOrEqualTo(root.get("price"),price.getMax()));
+                }
+            }
+            if(rentSearch.getDirection()>0){
+                predicate=cb.and(predicate,cb.equal(root.get("direction"),rentSearch.getDirection()));
+            }
+            return predicate;
+        };
+        houses=houseRepo.findAll(specification,pageable);
+        //默认以创建时间排序，另支持按价格，面积排序
 
         //将houseId与house实体类做映射
         List<Long>houseIds=new ArrayList<>();
         Map<Long,HouseDto>houseMap=new HashMap<>();
-        List<HouseDto> houseDtos = new ArrayList<>();
+        List<HouseDto> houseDtos = new ArrayList<>(),res;
 
         for(House house:houses.getContent()){
             HouseDto houseDto=ConvertUtil.convertHouseDto(house);
@@ -412,37 +414,17 @@ public class HouseService {
             HouseDto houseDto=houseMap.get(houseTag.getHouseId());
             houseDto.getTags().add(houseTag.getName());
         });
-        //范围查询
-        RentValueBlock area =RentValueBlock.matchArea(rentSearch.getAreaBlock());
-        if(!RentValueBlock.ALL.equals(area)){
-            if(area.getMax()>0){
-                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getArea()<area.getMax()).collect(Collectors.toList());
-            }
-            if(area.getMin()>0){
-                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getArea()>area.getMin()).collect(Collectors.toList());
-            }
+
+        switch(rentSearch.getOrderBy()){
+            case "price":res=houseDtos.stream().sorted(Comparator.comparing(HouseDto::getPrice)).collect(Collectors.toList());break;
+            case "area":res=houseDtos.stream().sorted(Comparator.comparing(HouseDto::getArea)).collect(Collectors.toList());break;
+            default:res=houseDtos.stream().sorted(Comparator.comparing(HouseDto::getLastUpdateTime)).collect(Collectors.toList());break;
         }
-        RentValueBlock price =RentValueBlock.matchPrice(rentSearch.getPriceBlock());
-        if(!RentValueBlock.ALL.equals(price)){
-            if(price.getMax()>0){
-                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getPrice()<price.getMax()).collect(Collectors.toList());
-            }
-            if(price.getMin()>0){
-                houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getPrice()>price.getMin()).collect(Collectors.toList());
-            }
+        if(rentSearch.getOrderDirection()!=null&&rentSearch.getOrderDirection().equals("desc")){
+            Collections.reverse(res);
         }
 
-        //租赁方式
-        if(rentSearch.getRentWay()>-1){
-            houseDtos=houseDtos.stream().filter(houseDto -> houseDto.getHouseDetail().getRentWay()==rentSearch.getRentWay()).collect(Collectors.toList());
-        }
 
-        //排序的处理
-        if(rentSearch.getOrderBy().equals("price")&&rentSearch.getOrderDirection().equals("desc")
-        || rentSearch.getOrderBy().equals("area")&&rentSearch.getOrderDirection().equals("asc")){
-            Collections.reverse(houseDtos);
-        }
-
-        return new ServiceMultiResult<>(houseDtos.size(),houseDtos);
+        return new ServiceMultiResult<>(res.size(),res);
     }
 }

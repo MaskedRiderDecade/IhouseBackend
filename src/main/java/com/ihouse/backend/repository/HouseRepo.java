@@ -11,7 +11,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.sql.Date;
 import java.util.List;
 
-public interface HouseRepo extends CrudRepository<House,Long> {
+public interface HouseRepo extends CrudRepository<House,Long>,JpaSpecificationExecutor<House> {
 
      Page<House> findByAdminIdAndStatusIsNotOrderByCreateTimeDesc(Long adminId,int status, Pageable pageable);
 
@@ -23,15 +23,11 @@ public interface HouseRepo extends CrudRepository<House,Long> {
 
      Page<House> findByStatusAndCityEnNameOrderByAreaDesc(int status, String cityEnName, Pageable pageable);
 
-     Page<House> findByStatusAndCityEnNameOrderByDistanceToSubwayAsc(int status, String cityEnName, Pageable pageable);
-
      Page<House> findByStatusAndCityEnNameAndRegionEnNameOrderByLastUpdateTimeDesc(int status, String cityEnName, String regionEnName, Pageable pageable);
 
      Page<House> findByStatusAndCityEnNameAndRegionEnNameOrderByPriceAsc(int status, String cityEnName, String regionEnName, Pageable pageable);
 
      Page<House> findByStatusAndCityEnNameAndRegionEnNameOrderByAreaDesc(int status, String cityEnName, String regionEnName, Pageable pageable);
-
-     Page<House> findByStatusAndCityEnNameAndRegionEnNameOrderByDistanceToSubwayAsc(int status, String cityEnName, String regionEnName, Pageable pageable);
 
     List<House> findAllByIdIn(List<Long>ids);
 }
