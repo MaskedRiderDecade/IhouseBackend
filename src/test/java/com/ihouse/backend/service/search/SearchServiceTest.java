@@ -27,8 +27,8 @@ public class SearchServiceTest {
 
     @Test
     public void index() {
-        boolean success=searchService.index(21L);
-        searchService.index(24L);
+        boolean success=searchService.index(24L);
+//        searchService.index(24L);
 //        searchService.index(18L);
 //        searchService.index(19L);
 //        searchService.index(20L);
@@ -37,7 +37,11 @@ public class SearchServiceTest {
 
     @Test
     public void remove(){
+        searchService.remove(37L);
         searchService.remove(38L);
+        searchService.remove(39L);
+
+
     }
 
     @Test

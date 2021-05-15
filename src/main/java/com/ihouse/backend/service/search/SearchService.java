@@ -207,9 +207,6 @@ public class SearchService {
         if(rentSearch.getDirection()>0){
             boolQuery.filter(QueryBuilders.termQuery(HouseIndexConstants.DIRECTION,rentSearch.getDirection()));
         }
-        if(rentSearch.getRentWay()>-1){
-            boolQuery.filter(QueryBuilders.termQuery(HouseIndexConstants.RENT_WAY,rentSearch.getRentWay()));
-        }
 
 
         boolQuery.must(QueryBuilders.multiMatchQuery(rentSearch.getKeywords(),

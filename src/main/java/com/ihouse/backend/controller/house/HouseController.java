@@ -77,17 +77,17 @@ public class HouseController {
 
     @PostMapping("rent/house")
     public ResponseVo showRentHouse(@Valid @RequestBody RentSearch rentSearch, BindingResult bindingResult){
-        if(rentSearch.getRegionEnName()==null){
+        if(rentSearch.getRegionEnName()==null||rentSearch.getRegionEnName().isEmpty()){
             rentSearch.setRegionEnName("*");
         }
         if(rentSearch.getPage()==0||rentSearch.getSize()==0){
             rentSearch.setPage(1);
             rentSearch.setSize(5);
         }
-        if(rentSearch.getOrderBy()==null){
+        if(rentSearch.getOrderBy()==null||rentSearch.getOrderBy().isEmpty()){
             rentSearch.setOrderBy("lastUpdateTime");
         }
-        if(rentSearch.getOrderDirection()==null){
+        if(rentSearch.getOrderDirection()==null||rentSearch.getOrderDirection().isEmpty()){
             rentSearch.setOrderDirection("desc");
         }
 

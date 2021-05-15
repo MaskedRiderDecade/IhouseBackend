@@ -56,7 +56,7 @@ public class AdminController {
 
     @PostMapping("/admin/add/house")
     public ResponseVo addHouse(@RequestHeader(name = "Authorization") String authorization,@Valid @RequestBody HouseForm houseForm, BindingResult bindingResult){
-        if(houseForm.getCover()==null){
+        if(houseForm.getCover()==null||houseForm.getCover().isEmpty()){
             throw new PictureNotFoundException();
         }
         Map<SupportAddress.Level, SupportAddressDto> addressDtoMap= addressService.findCityAndRegion(houseForm.getCityEnName(),houseForm.getRegionEnName());
@@ -122,7 +122,7 @@ public class AdminController {
     @PostMapping("admin/house/tag")
     public ResponseVo addHouseTag(@RequestParam(value = "houseId") Long houseId,
                                    @RequestParam(value = "tag") String tag) {
-        if (houseId < 1 || tag==null||tag.equals("")) {
+        if (houseId==null||houseId < 1 || tag==null||tag.equals("")) {
             throw new ParamsNotValidException();
         }
 

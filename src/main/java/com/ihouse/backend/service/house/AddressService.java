@@ -84,7 +84,7 @@ public class AddressService {
     }
 
     public ServiceMultiResult<SupportAddressDto> findAllRegionsByCityName(String cityName) {
-        if(cityName==null){
+        if(cityName==null||cityName.isEmpty()){
             return new ServiceMultiResult<>(0, null);
         }
         List<SupportAddress> regions = supportAddressRepo.findAllByLevelAndBelongTo(SupportAddress.Level.REGION
@@ -102,7 +102,7 @@ public class AddressService {
     }
 
     public ServiceMultiResult<SubwayDto> findAllSubwayByCity(String cityEnName) {
-        if(cityEnName==null){
+        if(cityEnName==null||cityEnName.isEmpty()){
             return new ServiceMultiResult<>(0, null);
         }
         List<Subway> subways = subwayRepo.findAllByCityEnName(cityEnName);
